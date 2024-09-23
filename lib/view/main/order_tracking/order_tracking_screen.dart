@@ -19,6 +19,8 @@ class OrderTrackingScreen extends StatelessWidget {
               'assets/icons/take_away.svg',
               height: screenWidth * 0.5,
               fit: BoxFit.fitHeight,
+              colorFilter: ColorFilter.mode(
+                  Theme.of(context).colorScheme.secondary, BlendMode.srcIn),
             ),
             const SizedBox(
               height: 32,
@@ -57,9 +59,7 @@ class OrderTrackingScreen extends StatelessWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context)
-                      .colorScheme
-                      .secondary,
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
                   elevation: 2,
                 ),
                 child: Text(

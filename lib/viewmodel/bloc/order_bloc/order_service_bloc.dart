@@ -14,8 +14,6 @@ class OrderServiceBloc extends Bloc<OrderServiceEvent, OrderServiceState> {
 
   Future<void> _onLoadOrderByUserDocId(
       LoadOrderByUserDocId event, Emitter<OrderServiceState> emit) async {
-    emit(OrderLoading());
-
     try {
       if (state is LoadOrderSuccess) {
         final currentState = state as LoadOrderSuccess;
@@ -24,6 +22,7 @@ class OrderServiceBloc extends Bloc<OrderServiceEvent, OrderServiceState> {
           return;
         }
       }
+      emit(OrderLoading());
       final List<CoffeeBill> listCoffeeBills =
           await _coffeeDataRepository.loadCoffeeOrder(event.userDocId);
 

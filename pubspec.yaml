@@ -33,6 +33,7 @@ dependencies:
   geolocator: ^13.0.1
   latlong2: ^0.9.1
   agora_rtc_engine: ^6.3.2
+  flame: ^1.19.0
 
 dev_dependencies:
   flutter_test:
@@ -79,6 +80,8 @@ flutter:
   - assets/pics/mocha.png
   - assets/pics/ad_background.jpg
   - assets/icons/not_found.svg
+  - assets/icons/clean.svg
+  - assets/icons/setting.svg
   - assets/icons/take_away.svg
   - assets/icons/detect.svg
   - assets/icons/delete.svg

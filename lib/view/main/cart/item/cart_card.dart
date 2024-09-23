@@ -52,16 +52,16 @@ class CartCard extends StatelessWidget {
 
     switch (ice) {
       case 0:
-        list.add(AppLocalizations.of(context)!.ice.toLowerCase());
+        list.add(AppLocalizations.of(context)!.littleIce.toLowerCase());
         break;
       case 1:
-        list.add(AppLocalizations.of(context)!.littleIce.toLowerCase());
+        list.add(AppLocalizations.of(context)!.mediumIce.toLowerCase());
         break;
       case 2:
         list.add(AppLocalizations.of(context)!.fullIce.toLowerCase());
         break;
       default:
-        list.add(AppLocalizations.of(context)!.ice.toLowerCase());
+        list.add(AppLocalizations.of(context)!.littleIce.toLowerCase());
     }
 
     return list.join(' | ');

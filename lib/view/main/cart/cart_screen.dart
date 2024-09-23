@@ -127,6 +127,11 @@ class CartScreenState extends State<CartScreen> {
                                       fit: BoxFit.cover,
                                       height: 24,
                                       width: 24,
+                                      colorFilter: ColorFilter.mode(
+                                          Theme.of(context)
+                                              .colorScheme
+                                              .secondary,
+                                          BlendMode.srcIn),
                                     ),
                                   ),
                                 ),
@@ -159,6 +164,9 @@ class CartScreenState extends State<CartScreen> {
                                   height: 24,
                                   width: 24,
                                   fit: BoxFit.fitHeight,
+                                  colorFilter: ColorFilter.mode(
+                                      Theme.of(context).colorScheme.secondary,
+                                      BlendMode.srcIn),
                                 ),
                               ),
                             ],
@@ -345,9 +353,9 @@ class CartScreenState extends State<CartScreen> {
                                 ],
                               ),
                               const Spacer(),
+                              //Purchase area
                               SizedBox(
                                 height: 51,
-                                width: 162,
                                 child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Theme.of(context)
@@ -374,6 +382,9 @@ class CartScreenState extends State<CartScreen> {
                                                   .colorScheme
                                                   .surface,
                                               BlendMode.srcIn),
+                                        ),
+                                        const SizedBox(
+                                          width: 5,
                                         ),
                                         Text(
                                           AppLocalizations.of(context)!.payNow,
@@ -416,7 +427,22 @@ class CartScreenState extends State<CartScreen> {
     final screenWidth = screenSize.width;
     return Scaffold(
       appBar: AppBar(
-        title: const Text(''),
+        title: Row(
+          children: [
+            const Spacer(),
+            IconButton(
+                onPressed: () {
+                  _clearCartItems();
+                },
+                icon: SvgPicture.asset(
+                  'assets/icons/clean.svg',
+                  width: 22,
+                  height: 22,
+                  colorFilter: ColorFilter.mode(
+                      Theme.of(context).colorScheme.secondary, BlendMode.srcIn),
+                ))
+          ],
+        ),
       ),
       body: Padding(
           padding: const EdgeInsets.only(left: 25, right: 25, top: 23),

@@ -83,5 +83,10 @@
   "dataLoadError": "Data loaded error!",
   "noDataAvailable": "No data available!",
   "delivered": "Delivered",
-  "notDelivered": "Not delivered"
+  "notDelivered": "Not delivered",
+  "validUntil": "Valid until {date}",
+  "settings": "Settings",
+  "themeMode": "Dark mode",
+  "language": "Language",
+  "retry": "Retry"
 }

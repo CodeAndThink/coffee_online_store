@@ -207,10 +207,11 @@ class RewardsScreenState extends State<RewardsScreen> {
                                   color: Theme.of(context).colorScheme.surface,
                                   fontSize: 12,
                                   shadows: [
-                                    const Shadow(
-                                      offset: Offset(1.0, 1.0),
+                                    Shadow(
+                                      offset: const Offset(1.0, 1.0),
                                       blurRadius: 3.0,
-                                      color: Colors.black,
+                                      color:
+                                          Theme.of(context).colorScheme.surface,
                                     ),
                                   ],
                                 ),

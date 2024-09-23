@@ -102,7 +102,9 @@ class HomeScreenState extends State<HomeScreen> {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => const CartScreen()));
             },
-            icon: SvgPicture.asset('assets/icons/buy.svg'),
+            icon: SvgPicture.asset('assets/icons/buy.svg',
+                colorFilter: ColorFilter.mode(
+                    Theme.of(context).colorScheme.secondary, BlendMode.srcIn)),
             iconSize: 26,
           ),
           const SizedBox(
@@ -116,7 +118,9 @@ class HomeScreenState extends State<HomeScreen> {
                   MaterialPageRoute(
                       builder: (context) => const ProfileScreen()));
             },
-            icon: SvgPicture.asset('assets/icons/profile.svg'),
+            icon: SvgPicture.asset('assets/icons/profile.svg',
+                colorFilter: ColorFilter.mode(
+                    Theme.of(context).colorScheme.secondary, BlendMode.srcIn)),
             iconSize: 26,
           ),
         ],

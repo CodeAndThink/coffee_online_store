@@ -77,7 +77,7 @@ class AppTheme {
       ),
       useMaterial3: true,
       colorScheme: const ColorScheme.dark(
-        primary: Colors.blueAccent,
+        primary: Colors.yellowAccent,
         secondary: Colors.orange,
         surface: Colors.black,
       ),

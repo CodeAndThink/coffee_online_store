@@ -173,14 +173,12 @@ class SignInScreenState extends State<SignInScreen> {
                               icon: Icon(
                                 _obscureText
                                     ? Icons.visibility_off
-                                    : Icons
-                                        .visibility,
+                                    : Icons.visibility,
                                 size: 18,
                               ),
                               onPressed: () {
                                 setState(() {
-                                  _obscureText =
-                                      !_obscureText;
+                                  _obscureText = !_obscureText;
                                 });
                               },
                             ),
@@ -207,6 +205,7 @@ class SignInScreenState extends State<SignInScreen> {
                                   .textTheme
                                   .headlineSmall
                                   ?.copyWith(
+                                    color: Colors.blueAccent,
                                     decoration: TextDecoration.underline,
                                     decorationStyle: TextDecorationStyle.solid,
                                   ),
@@ -262,7 +261,14 @@ class SignInScreenState extends State<SignInScreen> {
                             },
                             child: Text(
                               AppLocalizations.of(context)!.signUp,
-                              style: Theme.of(context).textTheme.headlineSmall,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineSmall
+                                  ?.copyWith(
+                                    color: Colors.blueAccent,
+                                    decoration: TextDecoration.underline,
+                                    decorationStyle: TextDecorationStyle.solid,
+                                  ),
                             )),
                       ],
                     ))),

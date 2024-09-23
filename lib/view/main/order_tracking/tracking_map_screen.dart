@@ -53,7 +53,20 @@ class TrackingMapScreenState extends State<TrackingMapScreen> {
               );
             } else if (state is MapError) {
               return Center(
-                child: Text('Error: ${state.message}'),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Error: ${state.message}'),
+                    const SizedBox(height: 10),
+                    ElevatedButton(
+                      onPressed: _getCurrentPosition,
+                      child: Text(
+                        AppLocalizations.of(context)!.retry,
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                    ),
+                  ],
+                ),
               );
             } else {
               return FlutterMap(
@@ -239,7 +252,7 @@ class TrackingMapScreenState extends State<TrackingMapScreen> {
                                                   Theme.of(context)
                                                       .colorScheme
                                                       .surface,
-                                                  BlendMode.dstIn),
+                                                  BlendMode.srcIn),
                                             ),
                                           ),
                                         ),
@@ -275,6 +288,9 @@ class TrackingMapScreenState extends State<TrackingMapScreen> {
                                       height: 40,
                                       width: 40,
                                       fit: BoxFit.fitHeight,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary,
                                     ),
                                   ),
                                   Row(
@@ -283,8 +299,7 @@ class TrackingMapScreenState extends State<TrackingMapScreen> {
                                         child: Container(
                                           color: Theme.of(context)
                                               .colorScheme
-                                              .secondary
-                                              .withOpacity(0.1),
+                                              .secondary,
                                           width: 50.0,
                                           height: 50.0,
                                           child: Center(
@@ -296,7 +311,7 @@ class TrackingMapScreenState extends State<TrackingMapScreen> {
                                                   Theme.of(context)
                                                       .colorScheme
                                                       .surface,
-                                                  BlendMode.dstIn),
+                                                  BlendMode.srcIn),
                                             ),
                                           ),
                                         ),

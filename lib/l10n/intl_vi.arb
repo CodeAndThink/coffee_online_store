@@ -18,7 +18,7 @@
   "username": "Tên người dùng",
   "mobileNumber": "Số điện thoại",
   "agreeTermsOfUseTitle": "Với việc đăng ký bạn đồng ý với",
-  "termsOfUse": "Điêuf khoản sử dụng",
+  "termsOfUse": "Điều khoản sử dụng",
   "alreadyAMember": "Đã là thành viên?",
   "enterEmail": "Điền địa chỉ email của bạn",
   "resendTime": "Gửi lại trong",
@@ -61,7 +61,7 @@
   "payNow": "Thanh toán ngay",
   "orderSuccess": "Đặt hàng thành công",
   "orderSuccessNote": "Đơn hàng của bạn đã được đặt thành công. Để biết thêm chi tiết, hãy đến đơn đặt hàng của tôi.",
-  "trackMyOrder": "theo dõi đơn hàng",
+  "trackMyOrder": "Theo dõi đơn hàng",
   "preparingYourOrder": "Đang chuẩn bị đơn hàng",
   "sendToYou": "Đang gửi cho bạn",
   "arrivalTime": "Thời gian ước tính {time}",
@@ -83,5 +83,10 @@
   "dataLoadError": "Dữ liệu tải thất bại!",
   "noDataAvailable": "Không có dữ liệu có sẵn!",
   "delivered": "Đã giao",
-  "notDelivered": "Chưa giao"
+  "notDelivered": "Chưa giao",
+  "validUntil": "Hiệu lực đến {date}",
+  "settings": "Cài đặt",
+  "themeMode": "Chủ đề",
+  "language": "Ngôn ngữ",
+  "retry": "Thử lại"
 }

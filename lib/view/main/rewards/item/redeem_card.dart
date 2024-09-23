@@ -1,4 +1,5 @@
-import 'package:coffee_online_store/model/models/cart_item_model.dart';
+import 'package:coffee_online_store/model/models/coffee_data_model.dart';
+import 'package:coffee_online_store/values/static_values.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
@@ -6,134 +7,74 @@ import 'package:intl/intl.dart';
 class RedeemCard extends StatelessWidget {
   const RedeemCard({
     super.key,
-    required this.cartItemModel,
+    required this.coffeeData,
   });
-  final CartItemModel cartItemModel;
-
-  String _propertiesConverse(
-      BuildContext context, int shot, int temp, int size, int ice) {
-    List<String> list = [];
-    switch (shot) {
-      case 0:
-        list.add(AppLocalizations.of(context)!.single.toLowerCase());
-        break;
-      case 1:
-        list.add(AppLocalizations.of(context)!.double.toLowerCase());
-        break;
-      default:
-        list.add(AppLocalizations.of(context)!.single.toLowerCase());
-    }
-
-    switch (temp) {
-      case 0:
-        list.add(AppLocalizations.of(context)!.hot.toLowerCase());
-        break;
-      case 1:
-        list.add(AppLocalizations.of(context)!.ice.toLowerCase());
-        break;
-      default:
-        list.add(AppLocalizations.of(context)!.hot.toLowerCase());
-    }
-
-    switch (size) {
-      case 0:
-        list.add(AppLocalizations.of(context)!.small.toLowerCase());
-        break;
-      case 1:
-        list.add(AppLocalizations.of(context)!.medium.toLowerCase());
-        break;
-      case 2:
-        list.add(AppLocalizations.of(context)!.big.toLowerCase());
-        break;
-      default:
-        list.add(AppLocalizations.of(context)!.small.toLowerCase());
-    }
-
-    switch (ice) {
-      case 0:
-        list.add(AppLocalizations.of(context)!.ice.toLowerCase());
-        break;
-      case 1:
-        list.add(AppLocalizations.of(context)!.littleIce.toLowerCase());
-        break;
-      case 2:
-        list.add(AppLocalizations.of(context)!.fullIce.toLowerCase());
-        break;
-      default:
-        list.add(AppLocalizations.of(context)!.ice.toLowerCase());
-    }
-
-    return list.join(' | ');
-  }
+  final CoffeeDataModel coffeeData;
 
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final screenWidth = screenSize.width;
+    final now = DateTime.now();
     return GestureDetector(
         child: SizedBox(
-          height: 120,
-          width: screenWidth,
-          child: Card(
-            child: Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Image.asset(
-                    cartItemModel.coffee.url,
-                    height: 80,
-                    width: 100,
-                    fit: BoxFit.fitHeight,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          cartItemModel.coffee.name,
-                          style: Theme.of(context).textTheme.headlineSmall,
-                        ),
-                        Text(
-                            _propertiesConverse(
-                                context,
-                                cartItemModel.shot,
-                                cartItemModel.temp,
-                                cartItemModel.size,
-                                cartItemModel.ice),
-                            overflow: TextOverflow.fade,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.copyWith(fontSize: 12)),
-                        Text(
-                          'x ${cartItemModel.quantity}',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineSmall
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-                const Spacer(),
-                Center(
-                  child: Text(
-                    NumberFormat.simpleCurrency().format(
-                        cartItemModel.coffee.price * cartItemModel.quantity),
+      height: 120,
+      width: screenWidth,
+      child: Card(
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        shape: const RoundedRectangleBorder(
+          side: BorderSide.none,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              FadeInImage.assetNetwork(
+                placeholder: urlEmptyHolder,
+                image: coffeeData.url,
+                imageErrorBuilder: (context, error, stackTrace) {
+                  return Image.asset(urlErrorHolder);
+                },
+                width: 100,
+                height: 80,
+                fit: BoxFit.cover,
+              ),
+              const SizedBox(
+                width: 16,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    coffeeData.name,
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
-                ),
-                const SizedBox(
-                  width: 8,
-                )
-              ],
-            ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                    AppLocalizations.of(context)!.validUntil(
+                        DateFormat('dd.MM.yy')
+                            .format(now.add(const Duration(days: 30)))
+                            .toString()),
+                    style: Theme.of(context).textTheme.bodySmall,
+                  )
+                ],
+              ),
+              const Spacer(),
+              ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.secondary),
+                  child: Text(
+                    '+ ${pointRedeem.toString()}',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.surface),
+                  ))
+            ],
           ),
-        ));
+        ),
+      ),
+    ));
   }
 }

@@ -32,6 +32,7 @@ class SignupScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final screenHeight = screenSize.height;
+    final screenWidth = screenSize.width;
     return Scaffold(
         appBar: AppBar(
           title: const Text(''),
@@ -334,8 +335,8 @@ class SignupScreenState extends State<SignUpScreen> {
                             obscureText: _obscureText,
                           ),
                           const SizedBox(height: 24),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                          Wrap(
+                            alignment: WrapAlignment.center,
                             children: [
                               Text(
                                 AppLocalizations.of(context)!
@@ -350,13 +351,15 @@ class SignupScreenState extends State<SignUpScreen> {
                                         .textTheme
                                         .headlineSmall
                                         ?.copyWith(
+                                          color: Colors.blueAccent,
                                           decoration: TextDecoration.underline,
                                           decorationStyle:
                                               TextDecorationStyle.solid,
                                         ),
+                                    overflow: TextOverflow.clip,
                                   )),
                             ],
-                          )
+                          ),
                         ],
                       ),
                     ),
@@ -408,8 +411,15 @@ class SignupScreenState extends State<SignUpScreen> {
                               },
                               child: Text(
                                 AppLocalizations.of(context)!.signIn,
-                                style:
-                                    Theme.of(context).textTheme.headlineSmall,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headlineSmall
+                                    ?.copyWith(
+                                      color: Colors.blueAccent,
+                                      decoration: TextDecoration.underline,
+                                      decorationStyle:
+                                          TextDecorationStyle.solid,
+                                    ),
                               )),
                         ],
                       ))),

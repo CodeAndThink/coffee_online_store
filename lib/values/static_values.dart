@@ -38,6 +38,7 @@ class TutorialValue {
 const String urlEmptyHolder = 'assets/pics/image-gallery.png';
 const String urlErrorHolder = 'assets/pics/broken-image.png';
 const int rewardPointPerCoffee = 12;
+const int pointRedeem = 1340;
 
 class MapValue {
   final LatLng shopPosition = const LatLng(51.509865, -0.118092);

@@ -1,6 +1,7 @@
 import 'package:coffee_online_store/view/main/home/home_screen.dart';
 import 'package:coffee_online_store/view/main/order/order_screen.dart';
 import 'package:coffee_online_store/view/main/rewards/rewards_screen.dart';
+import 'package:coffee_online_store/view/main/setting/setting_screen.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -25,6 +26,7 @@ class MainScreenState extends State<MainScreen> {
     const HomeScreen(),
     const RewardsScreen(),
     const OrderScreen(),
+    const SettingScreen(),
   ];
 
   @override
@@ -39,9 +41,10 @@ class MainScreenState extends State<MainScreen> {
           SvgPicture.asset('assets/icons/home.svg', width: 22, height: 22),
           SvgPicture.asset('assets/icons/gift.svg', width: 22, height: 22),
           SvgPicture.asset('assets/icons/list.svg', width: 22, height: 22),
+          SvgPicture.asset('assets/icons/setting.svg', width: 22, height: 22),
         ],
         animationDuration: const Duration(milliseconds: 300),
-        onTap: _onItemTapped, 
+        onTap: _onItemTapped,
       ),
     );
   }
