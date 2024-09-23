@@ -1,4 +1,5 @@
 import 'package:coffee_online_store/model/models/cart_item_model.dart';
+import 'package:coffee_online_store/values/static_values.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
@@ -72,68 +73,72 @@ class CartCard extends StatelessWidget {
     final screenWidth = screenSize.width;
     return GestureDetector(
         child: SizedBox(
-          height: 120,
-          width: screenWidth,
-          child: Card(
-            child: Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Image.asset(
-                    cartItemModel.coffee.url,
-                    height: 80,
-                    width: 100,
-                    fit: BoxFit.fitHeight,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          cartItemModel.coffee.name,
-                          style: Theme.of(context).textTheme.headlineSmall,
-                        ),
-                        Text(
-                            _propertiesConverse(
-                                context,
-                                cartItemModel.shot,
-                                cartItemModel.temp,
-                                cartItemModel.size,
-                                cartItemModel.ice),
-                            overflow: TextOverflow.fade,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.copyWith(fontSize: 12)),
-                        Text(
-                          'x ${cartItemModel.quantity}',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineSmall
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-                const Spacer(),
-                Center(
-                  child: Text(
-                    NumberFormat.simpleCurrency().format(
-                        cartItemModel.coffee.price * cartItemModel.quantity),
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  ),
-                ),
-                const SizedBox(
-                  width: 8,
-                )
-              ],
+      height: 120,
+      width: screenWidth,
+      child: Card(
+        child: Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: FadeInImage.assetNetwork(
+                placeholder: urlEmptyHolder,
+                image: cartItemModel.coffee.url,
+                imageErrorBuilder: (context, error, stackTrace) {
+                  return Image.asset(urlErrorHolder);
+                },
+                width: 100,
+                height: 80,
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
-        ));
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      cartItemModel.coffee.name,
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    Text(
+                        _propertiesConverse(
+                            context,
+                            cartItemModel.shot,
+                            cartItemModel.temp,
+                            cartItemModel.size,
+                            cartItemModel.ice),
+                        overflow: TextOverflow.fade,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.copyWith(fontSize: 12)),
+                    Text(
+                      'x ${cartItemModel.quantity}',
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineSmall
+                          ?.copyWith(fontWeight: FontWeight.bold),
+                    )
+                  ],
+                ),
+              ),
+            ),
+            const Spacer(),
+            Center(
+              child: Text(
+                NumberFormat.simpleCurrency().format(
+                    cartItemModel.coffee.price * cartItemModel.quantity),
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+            ),
+            const SizedBox(
+              width: 8,
+            )
+          ],
+        ),
+      ),
+    ));
   }
 }

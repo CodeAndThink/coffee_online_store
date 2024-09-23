@@ -1,9 +1,15 @@
 import 'package:coffee_online_store/model/models/cart_item_model.dart';
 import 'package:coffee_online_store/view/main/cart/item/cart_card.dart';
 import 'package:coffee_online_store/view/main/order_tracking/order_tracking_screen.dart';
+import 'package:coffee_online_store/viewmodel/bloc/auth_bloc/auth_service_bloc.dart';
+import 'package:coffee_online_store/viewmodel/bloc/auth_bloc/auth_service_event.dart';
+import 'package:coffee_online_store/viewmodel/bloc/auth_bloc/auth_service_state.dart';
+import 'package:coffee_online_store/viewmodel/bloc/order_bloc/order_service_bloc.dart';
+import 'package:coffee_online_store/viewmodel/bloc/order_bloc/order_service_event.dart';
 import 'package:coffee_online_store/viewmodel/bloc/cart_service_bloc/cart_service_bloc.dart';
 import 'package:coffee_online_store/viewmodel/bloc/cart_service_bloc/cart_service_event.dart';
 import 'package:coffee_online_store/viewmodel/bloc/cart_service_bloc/cart_service_state.dart';
+import 'package:coffee_online_store/viewmodel/bloc/order_bloc/order_service_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -20,10 +26,27 @@ class CartScreen extends StatefulWidget {
 class CartScreenState extends State<CartScreen> {
   double totalPrice = 0;
   int _selectedPayment = 0;
+  late List<CartItemModel> cartItems;
+
   @override
   void initState() {
     super.initState();
     _loadCartList();
+    _getLocalUserProfile();
+  }
+
+  void _getLocalUserProfile() {
+    context.read<AuthServiceBloc>().add(GetLocalUserProfile());
+  }
+
+  void _createNewOrder(
+      String userDocId, List<CartItemModel> cartData, String deliveryAddress) {
+    context.read<OrderServiceBloc>().add(CreateNewOrder(
+          userDocId,
+          cartData,
+          _selectedPayment,
+          deliveryAddress,
+        ));
   }
 
   void _removeCartItem(int index) {
@@ -34,307 +57,355 @@ class CartScreenState extends State<CartScreen> {
     context.read<CartServiceBloc>().add(GetCart());
   }
 
+  void _clearCartItems() {
+    context.read<CartServiceBloc>().add(ClearCart());
+  }
+
   Widget _showBottomSheet(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final screenWidth = screenSize.width;
-    return FractionallySizedBox(
-      heightFactor: 0.80,
-      child: StatefulBuilder(
-        builder: (BuildContext context, StateSetter setState) {
-          return Container(
-            padding: const EdgeInsets.all(33.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppLocalizations.of(context)!.orderInformation,
-                  style: Theme.of(context).textTheme.headlineMedium,
-                ),
-                const SizedBox(height: 35),
-                Text(
-                  AppLocalizations.of(context)!.deliveryAddress,
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                const SizedBox(height: 19),
-                // Delivery address
-                SizedBox(
-                  width: double.infinity,
-                  height: 100,
-                  child: Card(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        SizedBox(
+    return BlocListener<OrderServiceBloc, OrderServiceState>(
+      listener: (context, state) {
+        if (state is OrderCreateSuccess) {
+          _clearCartItems();
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const OrderTrackingScreen()),
+              (Route<dynamic> route) => false);
+        }
+      },
+      child: FractionallySizedBox(
+        heightFactor: 0.80,
+        child: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return BlocConsumer<AuthServiceBloc, AuthServiceState>(
+                listener: (context, state) {
+              if (state is AuthServiceError) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                      content:
+                          Text(AppLocalizations.of(context)!.noDataAvailable)),
+                );
+              }
+            }, builder: (context, state) {
+              if (state is AuthServiceLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (state is LoadLocalUserProfileSuccess) {
+                return Container(
+                  padding: const EdgeInsets.all(33.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)!.orderInformation,
+                        style: Theme.of(context).textTheme.headlineMedium,
+                      ),
+                      const SizedBox(height: 35),
+                      Text(
+                        AppLocalizations.of(context)!.deliveryAddress,
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                      const SizedBox(height: 19),
+                      // Delivery address
+                      SizedBox(
+                        width: double.infinity,
+                        height: 100,
+                        child: Card(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              SizedBox(
+                                height: 50,
+                                width: 50,
+                                child: Card(
+                                  child: Center(
+                                    child: SvgPicture.asset(
+                                      'assets/icons/delivery.svg',
+                                      fit: BoxFit.cover,
+                                      height: 24,
+                                      width: 24,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                width: screenWidth * 0.5,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Anderson',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineSmall,
+                                    ),
+                                    Text(
+                                      state.userMetadata.userData.address,
+                                      style:
+                                          Theme.of(context).textTheme.bodySmall,
+                                      overflow: TextOverflow.clip,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: () {},
+                                icon: SvgPicture.asset(
+                                  'assets/icons/edit.svg',
+                                  height: 24,
+                                  width: 24,
+                                  fit: BoxFit.fitHeight,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 19),
+                      // Payment option 1
+                      SizedBox(
+                        width: double.infinity,
+                        height: 100,
+                        child: Card(
+                          child: Row(
+                            children: [
+                              Radio<int>(
+                                value: 0,
+                                groupValue: _selectedPayment,
+                                onChanged: (int? value) {
+                                  setState(() {
+                                    _selectedPayment = value!;
+                                  });
+                                },
+                                activeColor: Colors.blue,
+                              ),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      AppLocalizations.of(context)!
+                                          .onlineBanking,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineSmall,
+                                    ),
+                                    Text(
+                                      'maybank2u (one-time)',
+                                      style:
+                                          Theme.of(context).textTheme.bodySmall,
+                                      overflow: TextOverflow.clip,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Image.asset(
+                                'assets/pics/fpx.png',
+                                height: 35,
+                                fit: BoxFit.fitHeight,
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 19),
+                      // Payment option 2
+                      SizedBox(
+                        width: double.infinity,
+                        height: 100,
+                        child: Card(
+                          child: Row(
+                            children: [
+                              Radio<int>(
+                                value: 1,
+                                groupValue: _selectedPayment,
+                                onChanged: (int? value) {
+                                  setState(() {
+                                    _selectedPayment = value!;
+                                  });
+                                },
+                                activeColor: Colors.blue,
+                              ),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      AppLocalizations.of(context)!.creditCard,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineSmall,
+                                    ),
+                                    Text(
+                                      '2540 xxxx xxxx 2648',
+                                      style:
+                                          Theme.of(context).textTheme.bodySmall,
+                                      overflow: TextOverflow.clip,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              //Visa icon
+                              Image.asset(
+                                'assets/pics/visa.png',
+                                height: 35,
+                                fit: BoxFit.fitHeight,
+                              ),
+                              //Master card icon
+                              Image.asset(
+                                'assets/pics/master_card.png',
+                                height: 35,
+                                fit: BoxFit.fitHeight,
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 46,
+                      ),
+                      //Subtotal
+                      Row(
+                        children: [
+                          Text(
+                            AppLocalizations.of(context)!.subtotal,
+                            style: Theme.of(context).textTheme.headlineSmall,
+                          ),
+                          const Spacer(),
+                          Text(
+                            NumberFormat.simpleCurrency().format(totalPrice),
+                            style: Theme.of(context).textTheme.headlineSmall,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 13,
+                      ),
+                      //Tax
+                      Row(
+                        children: [
+                          Text(
+                            AppLocalizations.of(context)!.tax,
+                            style: Theme.of(context).textTheme.headlineSmall,
+                          ),
+                          const Spacer(),
+                          Text(
+                            NumberFormat.simpleCurrency().format(totalPrice),
+                            style: Theme.of(context).textTheme.headlineSmall,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 13,
+                      ),
+                      //Delivery fee
+                      Row(
+                        children: [
+                          Text(
+                            AppLocalizations.of(context)!.deliveryFee,
+                            style: Theme.of(context).textTheme.headlineSmall,
+                          ),
+                          const Spacer(),
+                          Text(
+                            NumberFormat.simpleCurrency().format(totalPrice),
+                            style: Theme.of(context).textTheme.headlineSmall,
+                          ),
+                        ],
+                      ),
+                      Expanded(
+                          child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: SizedBox(
                           height: 50,
-                          width: 50,
-                          child: Card(
-                            child: Center(
-                              child: SvgPicture.asset(
-                                'assets/icons/delivery.svg',
-                                fit: BoxFit.cover,
-                                height: 24,
-                                width: 24,
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: screenWidth * 0.5,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
+                          width: screenWidth - 50,
+                          child: Row(
                             children: [
-                              Text(
-                                'Anderson',
-                                style:
-                                    Theme.of(context).textTheme.headlineSmall,
-                              ),
-                              Text(
-                                '3 Addersion Court Chino Hills, HO56824, United States',
-                                style: Theme.of(context).textTheme.bodySmall,
-                                overflow: TextOverflow.clip,
-                              ),
-                            ],
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {},
-                          icon: SvgPicture.asset(
-                            'assets/icons/edit.svg',
-                            height: 24,
-                            width: 24,
-                            fit: BoxFit.fitHeight,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 19),
-                // Payment option 1
-                SizedBox(
-                  width: double.infinity,
-                  height: 100,
-                  child: Card(
-                    child: Row(
-                      children: [
-                        Radio<int>(
-                          value: 0,
-                          groupValue: _selectedPayment,
-                          onChanged: (int? value) {
-                            setState(() {
-                              _selectedPayment = value!;
-                            });
-                          },
-                          activeColor: Colors.blue,
-                        ),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                AppLocalizations.of(context)!.onlineBanking,
-                                style:
-                                    Theme.of(context).textTheme.headlineSmall,
-                              ),
-                              Text(
-                                'maybank2u (one-time)',
-                                style: Theme.of(context).textTheme.bodySmall,
-                                overflow: TextOverflow.clip,
-                              ),
-                            ],
-                          ),
-                        ),
-                        Image.asset(
-                          'assets/pics/fpx.png',
-                          height: 35,
-                          fit: BoxFit.fitHeight,
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 19),
-                // Payment option 2
-                SizedBox(
-                  width: double.infinity,
-                  height: 100,
-                  child: Card(
-                    child: Row(
-                      children: [
-                        Radio<int>(
-                          value: 1,
-                          groupValue: _selectedPayment,
-                          onChanged: (int? value) {
-                            setState(() {
-                              _selectedPayment = value!;
-                            });
-                          },
-                          activeColor: Colors.blue,
-                        ),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                AppLocalizations.of(context)!.creditCard,
-                                style:
-                                    Theme.of(context).textTheme.headlineSmall,
-                              ),
-                              Text(
-                                '2540 xxxx xxxx 2648',
-                                style: Theme.of(context).textTheme.bodySmall,
-                                overflow: TextOverflow.clip,
-                              ),
-                            ],
-                          ),
-                        ),
-                        //Visa icon
-                        Image.asset(
-                          'assets/pics/visa.png',
-                          height: 35,
-                          fit: BoxFit.fitHeight,
-                        ),
-                        //Master card icon
-                        Image.asset(
-                          'assets/pics/master_card.png',
-                          height: 35,
-                          fit: BoxFit.fitHeight,
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 46,
-                ),
-                //Subtotal
-                Row(
-                  children: [
-                    Text(
-                      AppLocalizations.of(context)!.subtotal,
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                    const Spacer(),
-                    Text(
-                      NumberFormat.simpleCurrency().format(totalPrice),
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 13,
-                ),
-                //Tax
-                Row(
-                  children: [
-                    Text(
-                      AppLocalizations.of(context)!.tax,
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                    const Spacer(),
-                    Text(
-                      NumberFormat.simpleCurrency().format(totalPrice),
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 13,
-                ),
-                //Delivery fee
-                Row(
-                  children: [
-                    Text(
-                      AppLocalizations.of(context)!.deliveryFee,
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                    const Spacer(),
-                    Text(
-                      NumberFormat.simpleCurrency().format(totalPrice),
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                  ],
-                ),
-                Expanded(
-                    child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: SizedBox(
-                    height: 50,
-                    width: screenWidth - 50,
-                    child: Row(
-                      children: [
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              AppLocalizations.of(context)!.totalPrice,
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                            Text(
-                              NumberFormat.simpleCurrency().format(totalPrice),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headlineLarge
-                                  ?.copyWith(fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
-                        const Spacer(),
-                        SizedBox(
-                          height: 51,
-                          width: 162,
-                          child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Theme.of(context)
-                                    .colorScheme
-                                    .secondary, // Màu nền của nút
-                                elevation: 2, // Độ cao (bóng đổ)
-                              ),
-                              onPressed: () {
-                                Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const OrderTrackingScreen()),
-                                    (Route<dynamic> route) => false);
-                              },
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  SvgPicture.asset(
-                                    'assets/icons/credit_card.svg',
-                                    height: 24,
-                                    width: 24,
-                                    colorFilter: ColorFilter.mode(
-                                        Theme.of(context).colorScheme.surface,
-                                        BlendMode.srcIn),
+                                  Text(
+                                    AppLocalizations.of(context)!.totalPrice,
+                                    style:
+                                        Theme.of(context).textTheme.bodySmall,
                                   ),
                                   Text(
-                                    AppLocalizations.of(context)!.payNow,
+                                    NumberFormat.simpleCurrency()
+                                        .format(totalPrice),
                                     style: Theme.of(context)
                                         .textTheme
-                                        .headlineSmall
-                                        ?.copyWith(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .surface,
-                                            fontWeight: FontWeight.bold),
-                                  )
+                                        .headlineLarge
+                                        ?.copyWith(fontWeight: FontWeight.bold),
+                                  ),
                                 ],
-                              )),
-                        )
-                      ],
-                    ),
+                              ),
+                              const Spacer(),
+                              SizedBox(
+                                height: 51,
+                                width: 162,
+                                child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .secondary,
+                                      elevation: 2,
+                                    ),
+                                    onPressed: () {
+                                      _createNewOrder(
+                                          state.userMetadata.userDocId,
+                                          cartItems,
+                                          state.userMetadata.userData.address);
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        SvgPicture.asset(
+                                          'assets/icons/credit_card.svg',
+                                          height: 24,
+                                          width: 24,
+                                          colorFilter: ColorFilter.mode(
+                                              Theme.of(context)
+                                                  .colorScheme
+                                                  .surface,
+                                              BlendMode.srcIn),
+                                        ),
+                                        Text(
+                                          AppLocalizations.of(context)!.payNow,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headlineSmall
+                                              ?.copyWith(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .surface,
+                                                  fontWeight: FontWeight.bold),
+                                        )
+                                      ],
+                                    )),
+                              )
+                            ],
+                          ),
+                        ),
+                      ))
+                    ],
                   ),
-                ))
-              ],
-            ),
-          );
-        },
+                );
+              } else if (state is AuthServiceError) {
+                return Container();
+              } else {
+                return Center(
+                  child: Text(AppLocalizations.of(context)!.noDataAvailable),
+                );
+              }
+            });
+          },
+        ),
       ),
     );
   }
@@ -367,6 +438,7 @@ class CartScreenState extends State<CartScreen> {
                       listener: (context, state) {
                 if (state is CartLoaded) {
                   List<CartItemModel> listCartItem = state.listCartItem;
+                  cartItems = listCartItem;
                   double price = 0;
                   for (int i = 0; i < listCartItem.length; i++) {
                     price +=
@@ -383,7 +455,7 @@ class CartScreenState extends State<CartScreen> {
                   );
                 } else if (state is CartLoaded) {
                   List<CartItemModel> listCartItem = state.listCartItem;
-
+                  cartItems = listCartItem;
                   return ListView.builder(
                       itemCount: listCartItem.length,
                       itemBuilder: (context, index) {
@@ -478,10 +550,9 @@ class CartScreenState extends State<CartScreen> {
                         width: 162,
                         child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context)
-                                  .colorScheme
-                                  .secondary, // Màu nền của nút
-                              elevation: 2, // Độ cao (bóng đổ)
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.secondary,
+                              elevation: 2,
                             ),
                             onPressed: () {
                               showModalBottomSheet(

@@ -1,4 +1,5 @@
 import 'package:coffee_online_store/model/models/coffee_data_model.dart';
+import 'package:coffee_online_store/values/static_values.dart';
 import 'package:flutter/material.dart';
 
 class CoffeeCard extends StatelessWidget {
@@ -15,10 +16,14 @@ class CoffeeCard extends StatelessWidget {
               padding: const EdgeInsets.all(25),
               child: Column(
                 children: [
-                  Image.asset(
-                    coffee.url,
-                    height: 80,
+                  FadeInImage.assetNetwork(
+                    placeholder: urlEmptyHolder,
+                    image: coffee.url,
+                    imageErrorBuilder: (context, error, stackTrace) {
+                      return Image.asset(urlErrorHolder);
+                    },
                     width: 100,
+                    height: 80,
                     fit: BoxFit.cover,
                   ),
                   const Spacer(),

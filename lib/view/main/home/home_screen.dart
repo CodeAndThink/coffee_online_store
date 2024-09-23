@@ -3,7 +3,16 @@ import 'package:coffee_online_store/view/main/cart/cart_screen.dart';
 import 'package:coffee_online_store/view/main/detail/detail_screen.dart';
 import 'package:coffee_online_store/view/main/home/item/coffee_card.dart';
 import 'package:coffee_online_store/view/main/profile/profile_screen.dart';
+import 'package:coffee_online_store/viewmodel/bloc/auth_bloc/auth_service_bloc.dart';
+import 'package:coffee_online_store/viewmodel/bloc/auth_bloc/auth_service_event.dart';
+import 'package:coffee_online_store/viewmodel/bloc/auth_bloc/auth_service_state.dart';
+import 'package:coffee_online_store/viewmodel/bloc/coffee_data_bloc/coffee_data_bloc.dart';
+import 'package:coffee_online_store/viewmodel/bloc/coffee_data_bloc/coffee_data_state.dart';
+import 'package:coffee_online_store/viewmodel/bloc/order_bloc/order_service_bloc.dart';
+import 'package:coffee_online_store/viewmodel/bloc/order_bloc/order_service_event.dart';
+import 'package:coffee_online_store/viewmodel/bloc/order_bloc/order_service_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -18,46 +27,19 @@ class HomeScreen extends StatefulWidget {
 class HomeScreenState extends State<HomeScreen> {
   final PageController _scrollController = PageController();
 
-  final List<CoffeeDataModel> data = [
-    CoffeeDataModel(
-        name: 'Americano', price: 1.2, url: 'assets/pics/americano.png'),
-    CoffeeDataModel(
-        name: 'Cappuccino', price: 2.3, url: 'assets/pics/cappuccino.png'),
-    CoffeeDataModel(
-        name: 'Flat White', price: 3.4, url: 'assets/pics/flat_white.png'),
-    CoffeeDataModel(name: 'Mocha', price: 4.5, url: 'assets/pics/mocha.png'),
-    CoffeeDataModel(
-        name: 'Coffee 1', price: 5.6, url: 'assets/pics/coffee (2).png'),
-    CoffeeDataModel(
-        name: 'Coffee 2', price: 6.7, url: 'assets/pics/coffee (3).png'),
-    CoffeeDataModel(
-        name: 'Coffee 3', price: 7.8, url: 'assets/pics/coffee (4).png'),
-    CoffeeDataModel(
-        name: 'Coffee 1', price: 5.6, url: 'assets/pics/coffee (2).png'),
-    CoffeeDataModel(
-        name: 'Coffee 2', price: 6.7, url: 'assets/pics/coffee (3).png'),
-    CoffeeDataModel(
-        name: 'Coffee 3', price: 7.8, url: 'assets/pics/coffee (4).png'),
-    CoffeeDataModel(
-        name: 'Americano', price: 1.2, url: 'assets/pics/americano.png'),
-    CoffeeDataModel(
-        name: 'Cappuccino', price: 2.3, url: 'assets/pics/cappuccino.png'),
-    CoffeeDataModel(
-        name: 'Flat White', price: 3.4, url: 'assets/pics/flat_white.png'),
-    CoffeeDataModel(name: 'Mocha', price: 4.5, url: 'assets/pics/mocha.png'),
-    CoffeeDataModel(
-        name: 'Coffee 1', price: 5.6, url: 'assets/pics/coffee (2).png'),
-    CoffeeDataModel(
-        name: 'Coffee 2', price: 6.7, url: 'assets/pics/coffee (3).png'),
-    CoffeeDataModel(
-        name: 'Coffee 3', price: 7.8, url: 'assets/pics/coffee (4).png'),
-    CoffeeDataModel(
-        name: 'Coffee 1', price: 5.6, url: 'assets/pics/coffee (2).png'),
-    CoffeeDataModel(
-        name: 'Coffee 2', price: 6.7, url: 'assets/pics/coffee (3).png'),
-    CoffeeDataModel(
-        name: 'Coffee 3', price: 7.8, url: 'assets/pics/coffee (4).png'),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadUserProfile();
+  }
+
+  void _loadUserProfile() {
+    context.read<AuthServiceBloc>().add(GetLocalUserProfile());
+  }
+
+  void _loadOrderList(String userDocId) {
+    context.read<OrderServiceBloc>().add(LoadOrderByUserDocId(userDocId));
+  }
 
   String _detectCurrentTime() {
     final currentTime = DateTime.now();
@@ -82,6 +64,7 @@ class HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.only(left: 10, right: 10),
       child: Row(
         children: [
+          //
           ConstrainedBox(
             constraints: BoxConstraints(
               maxWidth: screenWidth * 0.3,
@@ -93,15 +76,27 @@ class HomeScreenState extends State<HomeScreen> {
                   _detectCurrentTime(),
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
-                Text(
-                  'Trg1432001',
-                  style: Theme.of(context).textTheme.headlineMedium,
-                  overflow: TextOverflow.ellipsis,
-                )
+                BlocBuilder<AuthServiceBloc, AuthServiceState>(
+                    builder: (context, state) {
+                  if (state is LoadLocalUserProfileSuccess) {
+                    return Text(
+                      state.userMetadata.userData.displayName,
+                      style: Theme.of(context).textTheme.headlineMedium,
+                      overflow: TextOverflow.ellipsis,
+                    );
+                  } else {
+                    return Text(
+                      AppLocalizations.of(context)!.noDataAvailable,
+                      style: Theme.of(context).textTheme.headlineMedium,
+                      overflow: TextOverflow.ellipsis,
+                    );
+                  }
+                })
               ],
             ),
           ),
           const Spacer(),
+          //Cart screen
           IconButton(
             onPressed: () {
               Navigator.push(context,
@@ -113,6 +108,7 @@ class HomeScreenState extends State<HomeScreen> {
           const SizedBox(
             width: 10,
           ),
+          //Profile screen
           IconButton(
             onPressed: () {
               Navigator.push(
@@ -137,114 +133,175 @@ class HomeScreenState extends State<HomeScreen> {
           title: _appBarLayout(context),
         ),
         body: SingleChildScrollView(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 26, right: 26),
-                child: Column(
-                  children: [
-                    const SizedBox(
-                      height: 18,
-                    ),
-                    SizedBox(
-                      height: 122,
-                      child: Card(
-                          color: Theme.of(context).colorScheme.secondary,
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 23, right: 23),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 7, right: 7, bottom: 9),
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        AppLocalizations.of(context)!
-                                            .loyaltyCard,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall
-                                            ?.copyWith(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .surface),
-                                      ),
-                                      const Spacer(),
-                                      Text(
-                                        '4 / 8',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall
-                                            ?.copyWith(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .surface),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 61,
-                                  child: Card(
-                                      child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: List.generate(
-                                      8,
-                                      (index) => SvgPicture.asset(
-                                          'assets/icons/inactive_cup.svg'),
+            child: Column(children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 26, right: 26),
+            child: Column(
+              children: [
+                const SizedBox(
+                  height: 18,
+                ),
+                SizedBox(
+                  height: 122,
+                  child: Card(
+                      color: Theme.of(context).colorScheme.secondary,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 23, right: 23),
+                        child: BlocListener<AuthServiceBloc, AuthServiceState>(
+                          listener: (context, state) {
+                            if (state is LoadLocalUserProfileSuccess) {
+                              _loadOrderList(state.userMetadata.userDocId);
+                            }
+                          },
+                          child:
+                              BlocBuilder<OrderServiceBloc, OrderServiceState>(
+                                  builder: (context, state) {
+                            if (state is OrderLoading) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            } else if (state is LoadOrderSuccess) {
+                              final listOrders = state.listBill;
+                              int totalCups = listOrders
+                                  .expand((coffeeBill) =>
+                                      coffeeBill.listOrderCoffee)
+                                  .fold(
+                                      0,
+                                      (sum, cartItem) =>
+                                          sum + cartItem.quantity);
+                              return Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 7, right: 7, bottom: 9),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          AppLocalizations.of(context)!
+                                              .loyaltyCard,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.copyWith(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .surface),
+                                        ),
+                                        const Spacer(),
+                                        Text(
+                                          '${totalCups.toString()} / 8',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.copyWith(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .surface),
+                                        )
+                                      ],
                                     ),
-                                  )),
-                                )
-                              ],
-                            ),
-                          )),
-                    ),
-                    const SizedBox(
-                      height: 18,
-                    ),
-                  ],
+                                  ),
+                                  SizedBox(
+                                    height: 61,
+                                    child: Card(
+                                        child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                          for (int i = 0; i < 8; i++)
+                                            i < totalCups % 8
+                                                ? SvgPicture.asset(
+                                                    'assets/icons/inactive_cup.svg',
+                                                    height: 24,
+                                                    width: 24,
+                                                    colorFilter:
+                                                        ColorFilter.mode(
+                                                            Theme.of(context)
+                                                                .colorScheme
+                                                                .secondary,
+                                                            BlendMode.srcIn),
+                                                  )
+                                                : SvgPicture.asset(
+                                                    'assets/icons/inactive_cup.svg',
+                                                    height: 24,
+                                                    width: 24,
+                                                  )
+                                        ])),
+                                  )
+                                ],
+                              );
+                            } else if (state is OrderError) {
+                              return Text(
+                                AppLocalizations.of(context)!
+                                    .loadCoffeeDataFailure,
+                                style:
+                                    Theme.of(context).textTheme.headlineMedium,
+                                overflow: TextOverflow.ellipsis,
+                              );
+                            } else {
+                              return Text(
+                                AppLocalizations.of(context)!.noDataAvailable,
+                                style:
+                                    Theme.of(context).textTheme.headlineMedium,
+                                overflow: TextOverflow.ellipsis,
+                              );
+                            }
+                          }),
+                        ),
+                      )),
                 ),
-              ),
-              Card(
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(16)),
+                const SizedBox(
+                  height: 18,
                 ),
-                color: Theme.of(context).colorScheme.secondary,
-                child: Padding(
-                  padding: const EdgeInsets.all(26),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        AppLocalizations.of(context)!.chooseCoffeeTitle,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.surface),
-                      ),
-                      const SizedBox(
-                        height: 24,
-                      ),
-                      SizedBox(
-                        width: screenWidth,
-                        height: 430,
-                        child: Column(
-                          children: [
-                            Expanded(
-                              child: PageView.builder(
+              ],
+            ),
+          ),
+          Card(
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(16)),
+            ),
+            color: Theme.of(context).colorScheme.secondary,
+            child: Padding(
+              padding: const EdgeInsets.all(26),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    AppLocalizations.of(context)!.chooseCoffeeTitle,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.surface),
+                  ),
+                  const SizedBox(
+                    height: 24,
+                  ),
+                  SizedBox(
+                      width: screenWidth,
+                      height: 430,
+                      child: BlocBuilder<CoffeeDataBloc, CoffeeDataState>(
+                          builder: (context, state) {
+                        if (state is DataLoading) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        } else if (state is DataLoaded) {
+                          final List<CoffeeDataModel> listData = state.listData;
+                          return Column(
+                            children: [
+                              Expanded(
+                                  child: PageView.builder(
                                 controller: _scrollController,
-                                itemCount: (data.length / 4).ceil(),
+                                itemCount: (listData.length / 4).ceil(),
                                 scrollDirection: Axis.horizontal,
                                 itemBuilder: (context, index) {
                                   final int startIndex = index * 4;
                                   final int endIndex =
-                                      (startIndex + 4) < data.length
+                                      (startIndex + 4) < listData.length
                                           ? startIndex + 4
-                                          : data.length;
+                                          : listData.length;
 
                                   final List<CoffeeDataModel> pageData =
-                                      data.sublist(startIndex, endIndex);
+                                      listData.sublist(startIndex, endIndex);
 
                                   return GridView.builder(
                                     shrinkWrap: true,
@@ -275,43 +332,50 @@ class HomeScreenState extends State<HomeScreen> {
                                     },
                                   );
                                 },
+                              )),
+                              const SizedBox(
+                                height: 9,
                               ),
-                            ),
-                            const SizedBox(
-                              height: 9,
-                            ),
-                            Align(
-                              alignment: Alignment.bottomCenter,
-                              child: Padding(
-                                padding: const EdgeInsets.only(bottom: 10),
-                                child: SmoothPageIndicator(
-                                  controller:
-                                      _scrollController, // Controller của PageView
-                                  count: (data.length / 4)
-                                      .ceil(), // Số lượng trang
-                                  effect: WormEffect(
-                                    dotColor: Theme.of(context)
-                                        .colorScheme
-                                        .surface, // Màu dot
-                                    activeDotColor: Theme.of(context)
-                                        .colorScheme
-                                        .primary, // Màu dot active
-                                    dotHeight: 8,
-                                    dotWidth: 10,
-                                    spacing: 5, // Khoảng cách giữa các dot
+                              Align(
+                                alignment: Alignment.bottomCenter,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(bottom: 10),
+                                  child: SmoothPageIndicator(
+                                    controller: _scrollController,
+                                    count: (listData.length / 4).ceil(),
+                                    effect: WormEffect(
+                                      dotColor:
+                                          Theme.of(context).colorScheme.surface,
+                                      activeDotColor:
+                                          Theme.of(context).colorScheme.primary,
+                                      dotHeight: 8,
+                                      dotWidth: 10,
+                                      spacing: 5,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            )
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              )
-            ],
-          ),
-        ));
+                              )
+                            ],
+                          );
+                        } else if (state is DataError) {
+                          return Center(
+                              child: Text(
+                            AppLocalizations.of(context)!.dataLoadError,
+                            style: Theme.of(context).textTheme.headlineSmall,
+                          ));
+                        } else {
+                          return Center(
+                            child: Text(
+                              AppLocalizations.of(context)!.noDataAvailable,
+                              style: Theme.of(context).textTheme.headlineSmall,
+                            ),
+                          );
+                        }
+                      })),
+                ],
+              ),
+            ),
+          )
+        ])));
   }
 }

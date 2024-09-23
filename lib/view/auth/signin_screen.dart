@@ -174,13 +174,13 @@ class SignInScreenState extends State<SignInScreen> {
                                 _obscureText
                                     ? Icons.visibility_off
                                     : Icons
-                                        .visibility, // Biểu tượng ẩn/hiện mật khẩu
+                                        .visibility,
                                 size: 18,
                               ),
                               onPressed: () {
                                 setState(() {
                                   _obscureText =
-                                      !_obscureText; // Đổi trạng thái ẩn/hiện mật khẩu
+                                      !_obscureText;
                                 });
                               },
                             ),

@@ -21,8 +21,11 @@ class SignupScreenState extends State<SignUpScreen> {
   final TextEditingController _emailAddressController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  void _signUp(String email, String password) {
-    context.read<AuthBloc>().add(SignUpEvent(email, password));
+  void _signUp(
+      String username, String phoneNumber, String email, String password) {
+    context
+        .read<AuthBloc>()
+        .add(SignUpEvent(username, phoneNumber, email, password));
   }
 
   @override
@@ -128,9 +131,13 @@ class SignupScreenState extends State<SignUpScreen> {
                                             )
                                           : null,
                                 ),
-                                style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.primary),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary),
                               );
                             },
                           ),
@@ -191,9 +198,13 @@ class SignupScreenState extends State<SignUpScreen> {
                                             )
                                           : null,
                                 ),
-                                style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.primary),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary),
                               );
                             },
                           ),
@@ -254,9 +265,13 @@ class SignupScreenState extends State<SignUpScreen> {
                                             )
                                           : null,
                                 ),
-                                style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.primary),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary),
                               );
                             },
                           ),
@@ -301,19 +316,21 @@ class SignupScreenState extends State<SignUpScreen> {
                                 icon: Icon(
                                   _obscureText
                                       ? Icons.visibility_off
-                                      : Icons
-                                          .visibility, // Biểu tượng ẩn/hiện mật khẩu
+                                      : Icons.visibility,
                                 ),
                                 onPressed: () {
                                   setState(() {
-                                    _obscureText =
-                                        !_obscureText; // Đổi trạng thái ẩn/hiện mật khẩu
+                                    _obscureText = !_obscureText;
                                   });
                                 },
                               ),
                             ),
-                            style: TextStyle(
-                                color: Theme.of(context).colorScheme.primary),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.primary),
                             obscureText: _obscureText,
                           ),
                           const SizedBox(height: 24),
@@ -360,7 +377,10 @@ class SignupScreenState extends State<SignUpScreen> {
                     ),
                     child: IconButton(
                       onPressed: () {
-                        _signUp(_emailAddressController.text,
+                        _signUp(
+                            _usernameController.text,
+                            _mobileNumberController.text,
+                            _emailAddressController.text,
                             _passwordController.text);
                       },
                       icon: Icon(

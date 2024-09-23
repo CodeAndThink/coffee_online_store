@@ -8,8 +8,15 @@ class SignInEvent extends AuthEvent {
 }
 
 class SignUpEvent extends AuthEvent {
+  final String displayName;
+  final String phoneNumber;
   final String email;
   final String password;
 
-  SignUpEvent(this.email, this.password);
+  SignUpEvent(
+    this.displayName,
+    this.phoneNumber,
+    this.email,
+    this.password,
+  );
 }

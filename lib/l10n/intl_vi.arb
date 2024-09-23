@@ -79,5 +79,9 @@
   "incomingCall": "Cuộc gọi đến",
   "mute": "Tắt tiếng",
   "keypad": "Bàn phím",
-  "speaker": "Bật loa"
+  "speaker": "Bật loa",
+  "dataLoadError": "Dữ liệu tải thất bại!",
+  "noDataAvailable": "Không có dữ liệu có sẵn!",
+  "delivered": "Đã giao",
+  "notDelivered": "Chưa giao"
 }

@@ -1,68 +1,99 @@
+import 'package:coffee_online_store/model/models/coffee_bill.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 class OrderCard extends StatelessWidget {
-  const OrderCard({super.key});
+  const OrderCard({super.key, required this.coffeeBill});
+  final CoffeeBill coffeeBill;
 
   @override
   Widget build(BuildContext context) {
     final screenSized = MediaQuery.of(context).size;
     final screenWidth = screenSized.width;
     return SizedBox(
-      height: 122,
+      height: 130,
       width: screenWidth,
       child: Card(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Row(
-              children: [
-                Text(
-                  '24 June | 12:30 PM',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-                const Spacer(),
-                Text(
-                  NumberFormat.simpleCurrency().format(3.00),
-                  style: Theme.of(context).textTheme.headlineLarge,
-                )
-              ],
-            ),
-            Row(
-              children: [
-                SvgPicture.asset(
-                  'assets/icons/cup.svg',
-                  height: 13,
-                  width: 13,
-                ),
-                const SizedBox(
-                  width: 11,
-                ),
-                Text(
-                  'Americano',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                )
-              ],
-            ),
-            Row(
-              children: [
-                SvgPicture.asset(
-                  'assets/icons/locate.svg',
-                  height: 13,
-                  width: 13,
-                ),
-                const SizedBox(
-                  width: 11,
-                ),
-                Text(
-                  '3 Addersion Court Chino Hills, HO56824, United State',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                  overflow: TextOverflow.ellipsis,
-                )
-              ],
-            )
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(5),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    DateFormat('dd MMMM | h:mm a').format(coffeeBill.orderTime),
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  const Spacer(),
+                  Text(
+                    NumberFormat.simpleCurrency().format(coffeeBill
+                        .listOrderCoffee
+                        .map((item) => item.quantity * item.coffee.price)
+                        .reduce((sum, itemTotal) => sum + itemTotal)),
+                    style: Theme.of(context).textTheme.headlineLarge,
+                  )
+                ],
+              ),
+              Row(
+                children: [
+                  SvgPicture.asset(
+                    'assets/icons/cup.svg',
+                    height: 20,
+                    width: 20,
+                    colorFilter: ColorFilter.mode(
+                        Theme.of(context).colorScheme.secondary,
+                        BlendMode.srcIn),
+                  ),
+                  const SizedBox(
+                    width: 11,
+                  ),
+                  Text(
+                    coffeeBill.listOrderCoffee
+                        .map((item) => item.coffee.name)
+                        .toList()
+                        .join(' | '),
+                    style: Theme.of(context).textTheme.headlineSmall,
+                    overflow: TextOverflow.clip,
+                  )
+                ],
+              ),
+              Row(
+                children: [
+                  SvgPicture.asset(
+                    'assets/icons/locate.svg',
+                    height: 20,
+                    width: 20,
+                    colorFilter: ColorFilter.mode(
+                        Theme.of(context).colorScheme.secondary,
+                        BlendMode.srcIn),
+                  ),
+                  const SizedBox(
+                    width: 11,
+                  ),
+                  Text(
+                    coffeeBill.deliveryAddress,
+                    style: Theme.of(context).textTheme.headlineSmall,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const Spacer(),
+                  Text(
+                      coffeeBill.deliveryState == false
+                          ? AppLocalizations.of(context)!.notDelivered
+                          : AppLocalizations.of(context)!.delivered,
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineSmall
+                          ?.copyWith(
+                              color: coffeeBill.deliveryState == false
+                                  ? Colors.redAccent
+                                  : Colors.greenAccent))
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );

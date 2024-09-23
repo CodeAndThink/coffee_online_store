@@ -1,5 +1,12 @@
 import 'package:coffee_online_store/view/main/order/item/order_card.dart';
+import 'package:coffee_online_store/viewmodel/bloc/auth_bloc/auth_service_bloc.dart';
+import 'package:coffee_online_store/viewmodel/bloc/auth_bloc/auth_service_event.dart';
+import 'package:coffee_online_store/viewmodel/bloc/auth_bloc/auth_service_state.dart';
+import 'package:coffee_online_store/viewmodel/bloc/order_bloc/order_service_bloc.dart';
+import 'package:coffee_online_store/viewmodel/bloc/order_bloc/order_service_event.dart';
+import 'package:coffee_online_store/viewmodel/bloc/order_bloc/order_service_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class OrderScreen extends StatefulWidget {
@@ -11,6 +18,20 @@ class OrderScreen extends StatefulWidget {
 
 class OrderScreenState extends State<OrderScreen> {
   int _selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _getLocalUserProfile();
+  }
+
+  void _getLocalUserProfile() {
+    context.read<AuthServiceBloc>().add(GetLocalUserProfile());
+  }
+
+  void _loadOrderList(String userDocId) {
+    context.read<OrderServiceBloc>().add(LoadOrderByUserDocId(userDocId));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,13 +129,51 @@ class OrderScreenState extends State<OrderScreen> {
           ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(left: 31, right: 31),
-              child: ListView.builder(
-                itemCount: 20,
-                itemBuilder: (context, index) {
-                  return const OrderCard();
-                },
-              ),
+              padding: const EdgeInsets.only(left: 20, right: 20),
+              child: BlocListener<AuthServiceBloc, AuthServiceState>(
+                  listener: (context, state) {
+                if (state is LoadLocalUserProfileSuccess) {
+                  _loadOrderList(state.userMetadata.userDocId);
+                }
+              }, child: BlocBuilder<OrderServiceBloc, OrderServiceState>(
+                      builder: (context, state) {
+                if (state is OrderLoading) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (state is LoadOrderSuccess) {
+                  final listOrders = state.listBill;
+                  final history = listOrders
+                      .where((state) => state.deliveryState == true)
+                      .toList();
+                  final onGoing = listOrders
+                      .where((state) => state.deliveryState == false)
+                      .toList();
+
+                  return _selectedIndex == 0
+                      ? ListView.builder(
+                          itemCount: onGoing.length,
+                          itemBuilder: (context, index) {
+                            return OrderCard(coffeeBill: onGoing[index]);
+                          },
+                        )
+                      : ListView.builder(
+                          itemCount: history.length,
+                          itemBuilder: (context, index) {
+                            return OrderCard(coffeeBill: history[index]);
+                          },
+                        );
+                } else if (state is OrderError) {
+                  return Center(
+                    child: Text(
+                        AppLocalizations.of(context)!.loadCoffeeDataFailure),
+                  );
+                } else {
+                  return Center(
+                    child: Text(AppLocalizations.of(context)!.noDataAvailable),
+                  );
+                }
+              })),
             ),
           ),
         ],

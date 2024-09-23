@@ -79,5 +79,9 @@
   "incomingCall": "Incoming Call",
   "mute": "Mute",
   "keypad": "Keypad",
-  "speaker": "Speaker"
+  "speaker": "Speaker",
+  "dataLoadError": "Data loaded error!",
+  "noDataAvailable": "No data available!",
+  "delivered": "Delivered",
+  "notDelivered": "Not delivered"
 }

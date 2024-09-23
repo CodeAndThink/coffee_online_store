@@ -80,6 +80,7 @@ flutter:
   - assets/pics/ad_background.jpg
   - assets/icons/not_found.svg
   - assets/icons/take_away.svg
+  - assets/icons/detect.svg
   - assets/icons/delete.svg
   - assets/icons/call.svg
   - assets/icons/message.svg

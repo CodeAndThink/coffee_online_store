@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
@@ -9,7 +11,7 @@ class MapServiceBloc extends Bloc<MapServiceEvent, MapServiceState> {
     on<PermissionRequest>(_onPermissionRequest);
     on<GetCurrentPosition>(_onGetCurrentPosition);
   }
-
+  //Ask user permission
   Future<void> _onPermissionRequest(
       PermissionRequest event, Emitter<MapServiceState> emit) async {
     emit(MapLoading());
@@ -21,6 +23,7 @@ class MapServiceBloc extends Bloc<MapServiceEvent, MapServiceState> {
     }
   }
 
+  //Get user current Location 
   Future<void> _onGetCurrentPosition(
       GetCurrentPosition event, Emitter<MapServiceState> emit) async {
     emit(MapLoading());
@@ -29,12 +32,15 @@ class MapServiceBloc extends Bloc<MapServiceEvent, MapServiceState> {
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.best,
         ),
-      );
-      final currentPosition = LatLng(position.latitude, position.longitude);
+      ).timeout(const Duration(seconds: 4), onTimeout: () {
+        throw TimeoutException("Load user location took too much time.");
+      });
 
+      final currentPosition = LatLng(position.latitude, position.longitude);
       emit(MapLoaded(currentPosition));
     } catch (e) {
-      emit(MapError(e.toString()));
+      emit(
+          MapError(e is TimeoutException ? "Loading overtime!" : e.toString()));
     }
   }
 }

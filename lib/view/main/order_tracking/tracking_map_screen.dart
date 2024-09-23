@@ -98,11 +98,19 @@ class TrackingMapScreenState extends State<TrackingMapScreen> {
         Positioned(
             right: 16,
             bottom: screenHeight * 0.36,
-            child: IconButton(
-              onPressed: () {
-                _getCurrentPosition();
-              },
-              icon: SvgPicture.asset('assets/icons/locate.svg'),
+            child: SizedBox(
+              height: 50,
+              width: 50,
+              child: IconButton(
+                onPressed: () {
+                  _getCurrentPosition();
+                },
+                icon: SvgPicture.asset('assets/icons/detect.svg'),
+                style: ButtonStyle(
+                  backgroundColor: WidgetStateProperty.all(
+                      Theme.of(context).colorScheme.secondary),
+                ),
+              ),
             )),
         Positioned(
           bottom: 0,

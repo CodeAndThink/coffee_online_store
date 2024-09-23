@@ -3,7 +3,7 @@ import 'coffee_data_model.dart';
 class CartItemModel {
   final CoffeeDataModel coffee;
   final int ice;
-  final int quantity;
+  int quantity;
   final int shot;
   final int size;
   final int temp;
@@ -39,5 +39,10 @@ class CartItemModel {
       size: json['size'],
       temp: json['temp'],
     );
+  }
+
+  @override
+  String toString() {
+    return 'CartItemModel(coffee: ${coffee.name}, ice: $ice, quantity: $quantity, shot: $shot, size: $size, temp: $temp)';
   }
 }

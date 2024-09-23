@@ -18,11 +18,23 @@ class CartServiceBloc extends Bloc<CartServiceEvent, CartServiceState> {
       AddCartItem event, Emitter<CartServiceState> emit) async {
     emit(CartLoading());
     try {
-      final List<CartItemModel> oldCartList =
-          await _coffeeDataRepository.getCart();
-      oldCartList.add(event.newValue);
-      final List<CartItemModel> newCartList = oldCartList;
-      await _coffeeDataRepository.saveCart(newCartList);
+      final List<CartItemModel> cartList =
+          await _coffeeDataRepository.loadCartItems();
+
+      final existingItemIndex = cartList.indexWhere((item) =>
+          item.coffee.name == event.newValue.coffee.name &&
+          item.ice == event.newValue.ice &&
+          item.shot == event.newValue.shot &&
+          item.size == event.newValue.size &&
+          item.temp == event.newValue.temp);
+
+      if (existingItemIndex != -1) {
+        cartList[existingItemIndex].quantity += event.newValue.quantity;
+      } else {
+        cartList.add(event.newValue);
+      }
+
+      await _coffeeDataRepository.saveCart(cartList);
       emit(CartSaveSuccess());
     } catch (e) {
       emit(CartError(e.toString()));
@@ -34,7 +46,7 @@ class CartServiceBloc extends Bloc<CartServiceEvent, CartServiceState> {
     emit(CartLoading());
     try {
       final List<CartItemModel> oldCartList =
-          await _coffeeDataRepository.getCart();
+          await _coffeeDataRepository.loadCartItems();
 
       oldCartList.removeAt(event.index);
       await _coffeeDataRepository.saveCart(oldCartList);
@@ -60,7 +72,7 @@ class CartServiceBloc extends Bloc<CartServiceEvent, CartServiceState> {
     emit(CartLoading());
     try {
       final List<CartItemModel> listData =
-          await _coffeeDataRepository.getCart();
+          await _coffeeDataRepository.loadCartItems();
       emit(CartLoaded(listData));
     } catch (e) {
       emit(CartError(e.toString()));

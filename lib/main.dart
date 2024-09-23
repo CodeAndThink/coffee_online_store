@@ -1,9 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:coffee_online_store/firebase_options.dart';
-import 'package:coffee_online_store/model/connection/local/cart_service.dart';
 import 'package:coffee_online_store/model/connection/repository/authentication_repository.dart';
 import 'package:coffee_online_store/model/connection/repository/coffee_data_repository.dart';
 import 'package:coffee_online_store/view/introduction/introduction_screen.dart';
 import 'package:coffee_online_store/viewmodel/bloc/auth_bloc/auth_bloc.dart';
+import 'package:coffee_online_store/viewmodel/bloc/auth_bloc/auth_service_bloc.dart';
+import 'package:coffee_online_store/viewmodel/bloc/order_bloc/order_service_bloc.dart';
 import 'package:coffee_online_store/viewmodel/bloc/cart_service_bloc/cart_service_bloc.dart';
 import 'package:coffee_online_store/viewmodel/bloc/coffee_data_bloc/coffee_data_bloc.dart';
 import 'package:coffee_online_store/viewmodel/bloc/map_bloc/map_service_bloc.dart';
@@ -20,16 +22,18 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  final CartService cartService = CartService();
+  final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
   final CoffeeDataRepository coffeeDataRepository =
-      CoffeeDataRepository(cartService);
+      CoffeeDataRepository(firebaseFirestore);
   final AuthenticationRepository authenticationRepository =
-      AuthenticationRepository(FirebaseAuth.instance);
+      AuthenticationRepository(FirebaseAuth.instance, firebaseFirestore);
   runApp(MultiBlocProvider(providers: [
     BlocProvider(create: (context) => SettingsBloc()),
     BlocProvider(create: (context) => AuthBloc(authenticationRepository)),
+    BlocProvider(create: (context) => AuthServiceBloc(authenticationRepository)),
     BlocProvider(create: (context) => CoffeeDataBloc(coffeeDataRepository)),
     BlocProvider(create: (context) => CartServiceBloc(coffeeDataRepository)),
+    BlocProvider(create: (context) => OrderServiceBloc(coffeeDataRepository)),
     BlocProvider(create: (context) => MapServiceBloc()),
   ], child: const MainApp()));
 }

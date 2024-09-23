@@ -1,5 +1,6 @@
 import 'package:coffee_online_store/model/models/cart_item_model.dart';
 import 'package:coffee_online_store/model/models/coffee_data_model.dart';
+import 'package:coffee_online_store/values/static_values.dart';
 import 'package:coffee_online_store/view/main/cart/cart_screen.dart';
 import 'package:coffee_online_store/viewmodel/bloc/cart_service_bloc/cart_service_bloc.dart';
 import 'package:coffee_online_store/viewmodel/bloc/cart_service_bloc/cart_service_event.dart';
@@ -31,10 +32,12 @@ class DetailScreenState extends State<DetailScreen> {
     _countController.text = '0';
   }
 
+  //Add product to cart
   void _addCartItem(CartItemModel cartItemModel) {
     context.read<CartServiceBloc>().add(AddCartItem(cartItemModel));
   }
 
+  //Increase the quantity of product
   void _increment() {
     final currentValue = int.tryParse(_countController.text) ?? 0;
     if (currentValue < 100) {
@@ -44,6 +47,7 @@ class DetailScreenState extends State<DetailScreen> {
     }
   }
 
+  //Decrease the quantity of product
   void _decrement() {
     final currentValue = int.tryParse(_countController.text) ?? 0;
     if (currentValue > 0) {
@@ -53,13 +57,12 @@ class DetailScreenState extends State<DetailScreen> {
     }
   }
 
+  //Limit the quantity
   void _updateValue(String value) {
     final newValue = int.tryParse(value);
     if (newValue == null || newValue < 0) {
-      // Nếu không phải số hoặc số âm, đặt lại giá trị về 0
       _countController.text = '0';
     } else if (newValue > 100) {
-      // Nếu số lớn hơn 100, đặt lại giá trị về 100
       _countController.text = '100';
     }
   }
@@ -106,10 +109,14 @@ class DetailScreenState extends State<DetailScreen> {
                       height: 146,
                       child: Card(
                         child: Center(
-                          child: Image.asset(
-                            widget.coffee.url,
-                            height: 128,
+                          child: FadeInImage.assetNetwork(
+                            placeholder: urlEmptyHolder,
+                            image: widget.coffee.url,
+                            imageErrorBuilder: (context, error, stackTrace) {
+                              return Image.asset(urlErrorHolder);
+                            },
                             width: 172,
+                            height: 128,
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -291,7 +298,7 @@ class DetailScreenState extends State<DetailScreen> {
                               ),
                             ],
                           ),
-                          //Choose type of carry
+                          //Choose type of temp
                           Column(
                             children: [
                               const SizedBox(
@@ -310,7 +317,7 @@ class DetailScreenState extends State<DetailScreen> {
                                     onPressed: () {
                                       setState(() {
                                         _selectedTemp =
-                                            0; // Cập nhật trạng thái khi nhấn icon
+                                            0; 
                                       });
                                     },
                                     icon: SvgPicture.asset(
@@ -333,7 +340,7 @@ class DetailScreenState extends State<DetailScreen> {
                                     onPressed: () {
                                       setState(() {
                                         _selectedTemp =
-                                            1; // Cập nhật trạng thái khi nhấn icon
+                                            1; 
                                       });
                                     },
                                     icon: SvgPicture.asset(
@@ -381,15 +388,14 @@ class DetailScreenState extends State<DetailScreen> {
                                   IconButton(
                                     onPressed: () {
                                       setState(() {
-                                        _selectedSize =
-                                            0; // Cập nhật trạng thái khi nhấn icon
+                                        _selectedSize = 0;
                                       });
                                     },
                                     icon: SvgPicture.asset(
                                       'assets/icons/cup.svg',
                                       height: 22,
                                       colorFilter: ColorFilter.mode(
-                                        _selectedTemp == 0
+                                        _selectedSize == 0
                                             ? Theme.of(context)
                                                 .colorScheme
                                                 .primary
@@ -404,15 +410,14 @@ class DetailScreenState extends State<DetailScreen> {
                                   IconButton(
                                     onPressed: () {
                                       setState(() {
-                                        _selectedSize =
-                                            1; // Cập nhật trạng thái khi nhấn icon
+                                        _selectedSize = 1;
                                       });
                                     },
                                     icon: SvgPicture.asset(
                                       'assets/icons/cup.svg',
                                       height: 31,
                                       colorFilter: ColorFilter.mode(
-                                        _selectedTemp == 1
+                                        _selectedSize == 1
                                             ? Theme.of(context)
                                                 .colorScheme
                                                 .primary
@@ -427,15 +432,14 @@ class DetailScreenState extends State<DetailScreen> {
                                   IconButton(
                                     onPressed: () {
                                       setState(() {
-                                        _selectedSize =
-                                            2; // Cập nhật trạng thái khi nhấn icon
+                                        _selectedSize = 2;
                                       });
                                     },
                                     icon: SvgPicture.asset(
                                       'assets/icons/cup.svg',
                                       height: 38,
                                       colorFilter: ColorFilter.mode(
-                                        _selectedTemp == 2
+                                        _selectedSize == 2
                                             ? Theme.of(context)
                                                 .colorScheme
                                                 .primary
@@ -476,15 +480,14 @@ class DetailScreenState extends State<DetailScreen> {
                                   IconButton(
                                     onPressed: () {
                                       setState(() {
-                                        _selectedIce =
-                                            0; // Cập nhật trạng thái khi nhấn icon
+                                        _selectedIce = 0;
                                       });
                                     },
                                     icon: SvgPicture.asset(
                                       'assets/icons/ice.svg',
                                       height: 14,
                                       colorFilter: ColorFilter.mode(
-                                        _selectedTemp == 0
+                                        _selectedIce == 0
                                             ? Theme.of(context)
                                                 .colorScheme
                                                 .primary
@@ -499,15 +502,14 @@ class DetailScreenState extends State<DetailScreen> {
                                   IconButton(
                                     onPressed: () {
                                       setState(() {
-                                        _selectedIce =
-                                            1; // Cập nhật trạng thái khi nhấn icon
+                                        _selectedIce = 1;
                                       });
                                     },
                                     icon: SvgPicture.asset(
                                       'assets/icons/some_ice.svg',
                                       height: 20,
                                       colorFilter: ColorFilter.mode(
-                                        _selectedTemp == 1
+                                        _selectedIce == 1
                                             ? Theme.of(context)
                                                 .colorScheme
                                                 .primary
@@ -522,15 +524,14 @@ class DetailScreenState extends State<DetailScreen> {
                                   IconButton(
                                     onPressed: () {
                                       setState(() {
-                                        _selectedIce =
-                                            2; // Cập nhật trạng thái khi nhấn icon
+                                        _selectedIce = 2;
                                       });
                                     },
                                     icon: SvgPicture.asset(
                                       'assets/icons/many_ice.svg',
                                       height: 27,
                                       colorFilter: ColorFilter.mode(
-                                        _selectedTemp == 2
+                                        _selectedIce == 2
                                             ? Theme.of(context)
                                                 .colorScheme
                                                 .primary
@@ -622,8 +623,8 @@ class DetailScreenState extends State<DetailScreen> {
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Theme.of(context)
                                         .colorScheme
-                                        .secondary, // Màu nền của nút
-                                    elevation: 2, // Độ cao (bóng đổ)
+                                        .secondary,
+                                    elevation: 2,
                                   ),
                                   onPressed: () {
                                     if (int.parse(_countController.text) > 0) {
